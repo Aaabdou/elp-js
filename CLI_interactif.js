@@ -34,6 +34,10 @@ const Hello = () => {
     return new Promise(resolve => input.question("> ", resolve));
 }
 
+function loop(){
+    Hello().then(operation).finally(loop);
+}
+
 async function listDirContents(filepath) {
     try {
         const files = await fs.promises.readdir(filepath);
@@ -58,12 +62,18 @@ function createDir(filepath){
 function createFile(filepath, content){
     fs.appendFile(filepath, content, function (error) {   
         if (error) {
-            console.error("Erreur'", error); }   
+            console.error(error); }   
         else console.log("Fichier créé !");
     });
 }
 
-
+function read(fichier){
+    fs.readFile(fichier, 'utf8', function(error, data) {
+        if (error) {
+            return console.error(error); }
+        else {  
+            return console.log(data); }
+        });}
 
 const operation = (response) => {
     const responseSplit = response.split(' ');
@@ -82,23 +92,23 @@ const operation = (response) => {
 
     } else if(response == "mkdir"){
         const filepath = prompt('Chemin du dossier: ');
-        createDir(filepath);
+        return createDir(filepath);
         
 	} else if(response == "dir"){  
         const name = prompt('Nom du répertoire: ');
-        listDirContents(name);
+        return listDirContents(name);
 
     } else if (response == "touch"){   // Créer un fichier
         const filepath = prompt("Nom du fichier: ");
         const contents = prompt("Contenu: ");
-        createFile(filepath, contents);
+        return createFile(filepath, contents);
         
     } else if (response == "cp"){   // Copier un fichier
         const nameFichier = prompt("Nom du fichier à copier: ");
         const nameFichierCopie = prompt("Nom du fichier copié: ");
         fs.copyFile(nameFichier, nameFichierCopie, function(error) { 
             if (error) {
-                console.error("Erreur'", error); } 
+                console.error(error); } 
             else console.log("Fichier copié !"); 
         });
 
@@ -106,23 +116,17 @@ const operation = (response) => {
         const supprimerFichier = prompt("Nom du fichier à supprimer: ");
         fs.unlink(supprimerFichier, function(error) { 
             if (error) {
-                console.error("Erreur'", error); } 
+                console.error(error); } 
             else console.log("Fichier supprimé !"); 
         });
 
     } else if (response == "read"){    // Lire un fichier
         const lireFichier = prompt("Nom du fichier: ");
-        fs.readFile(lireFichier, 'utf8', function(error, data) {
-            if (error) {
-                console.error("Erreur'", error);
-            }
-            else {  
-                console.log(data); 
-            }});
-
+        return read(lireFichier);
+        
     } else if (response == "lp"){  // Lister les processus en cours
         const output = execSync('ps -ef', { encoding: 'utf-8' }); 
-        console.log('Processus en cours:\n', output);
+        console.log('Processus en cours:\n', output); 
 
     } else if (responseSplit.length > 1 && responseSplit[0] == "bing"){  
         switch (responseSplit[0] == "bing"){   
@@ -145,24 +149,31 @@ const operation = (response) => {
         
     } else if(responseSplit[0] == "keep"){    //Détacher un processus
         const pid = responseSplit[1];
-        exec('disown -h ' + pid);
-        console.log('Processus détaché');
+        exec('disown -h ' + pid, (error, output) => {
+            if(error){
+                console.log(error);
+            }
+            else {
+                console.log(output, "Processus détaché");
+            }
+
+        });
 
     } else if(response == "run"){
         const chemin = prompt("Prog: ")
         exec('node ' + chemin, (error, output) => {
             if(error){
-                console.log("Erreur", error);
+                console.log(error);
             }
             else {
                 console.log(output);
             }
         });
-    }
+    } 
     
     else { 
         console.log("Erreur!"); 
     }
 };
 
-Hello().then(operation);
+loop();
