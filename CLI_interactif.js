@@ -160,8 +160,8 @@ const operation = (response) => {
         });
 
     } else if(response == "run"){
-        const chemin = prompt("Prog: ")
-        exec('node ' + chemin, (error, output) => {
+        const app = prompt("Prog: ")
+        exec(app, (error, output) => {
             if(error){
                 console.log(error);
             }
