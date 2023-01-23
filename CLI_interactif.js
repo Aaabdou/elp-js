@@ -11,7 +11,8 @@ const { Command } = require("commander");
 const program = new Command();
 const options = program.opts();
 const yargs = require("yargs");
-const { stdout, stdin } = require('process');
+const { stdout, stdin, pid } = require('process');
+const { number } = require('yargs');
 
 console.log(figlet.textSync("Bonjour"));
 // -h afficher les helps
@@ -73,10 +74,20 @@ function read(fichier){
             return console.error(error); }
         else {  
             return console.log(data); }
-        });}
+    });
+}
 
 const operation = (response) => {
     const responseSplit = response.split(' ');
+
+    function arrierePlan(){
+        if (responseSplit.pop() == "!"){
+                const li = response.substring(0, response.length - 1);
+                return li.concat("&");
+        } else {
+            return "";
+        }
+    }
 
     readline.emitKeypressEvents(process.stdin);
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
@@ -85,12 +96,7 @@ const operation = (response) => {
         process.exit(1); }
     });
 
-    // rajouter & à la fin -> exécuter en tâche de fond
-    if (responseSplit.pop() == "!"){
-        const li = response.substring(0, response.length - 1);
-        const arrierePlan = li.concat("&");
-
-    } else if(response == "mkdir"){
+    if(response == "mkdir"){
         const filepath = prompt('Chemin du dossier: ');
         return createDir(filepath);
         
@@ -103,7 +109,7 @@ const operation = (response) => {
         const contents = prompt("Contenu: ");
         return createFile(filepath, contents);
         
-    } else if (response == "cp"){   // Copier un fichier
+    } else if (response == "cp"){     // Copier un fichier
         const nameFichier = prompt("Nom du fichier à copier: ");
         const nameFichierCopie = prompt("Nom du fichier copié: ");
         fs.copyFile(nameFichier, nameFichierCopie, function(error) { 
@@ -148,20 +154,19 @@ const operation = (response) => {
         
         
     } else if(responseSplit[0] == "keep"){    //Détacher un processus
-        const pid = responseSplit[1];
-        exec('disown -h ' + pid, (error, output) => {
+        const pidKeep = responseSplit[1];
+        exec('disown -h ' + pidKeep, (error, output) => {
             if(error){
                 console.log(error);
             }
             else {
                 console.log(output, "Processus détaché");
             }
-
         });
 
     } else if(response == "run"){
         const app = prompt("Prog: ")
-        exec(app, (error, output) => {
+        exec(app + arrierePlan(), (error, output) => {
             if(error){
                 console.log(error);
             }
@@ -171,9 +176,7 @@ const operation = (response) => {
         });
     } 
     
-    else { 
-        console.log("Erreur!"); 
-    }
+    else { console.log("Erreur"); }
 };
 
 loop();
