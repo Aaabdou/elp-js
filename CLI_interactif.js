@@ -9,8 +9,6 @@ const { exec } = require('child_process');
 const figlet = require("figlet");
 const { Command } = require("commander");
 const program = new Command();
-const options = program.opts();
-const yargs = require("yargs");
 const { stdout, stdin, pid } = require('process');
 const { number } = require('yargs');
 
