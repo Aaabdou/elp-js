@@ -9,8 +9,8 @@ const { exec } = require('child_process');
 const figlet = require("figlet");
 const { Command } = require("commander");
 const program = new Command();
-const { stdout, stdin, pid } = require('process');
-const { number } = require('yargs');
+//const { stdout, stdin, pid } = require('process');
+
 
 console.log(figlet.textSync("Bonjour"));
 // -h afficher les helps
@@ -153,6 +153,7 @@ const operation = (response) => {
         
     } else if(responseSplit[0] == "keep"){    //Détacher un processus
         const pidKeep = responseSplit[1];
+        //console.log(pidKeep);
         exec('disown -h ' + pidKeep, (error, output) => {
             if(error){
                 console.log(error);
