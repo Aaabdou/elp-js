@@ -37,7 +37,7 @@ function loop(){
     Hello().then(operation).finally(loop);
 }
 
-async function listDirContents(filepath) {
+async function listDirContents(filepath) {  // lister le contenu d'un répertoire
     try {
         const files = await fs.promises.readdir(filepath);
         const detailedFilesPromises = files.map(async (file) => {
@@ -46,19 +46,19 @@ async function listDirContents(filepath) {
             return { filename: file, "size(KB)": size, created_at: birthtime };
         });
         const detailedFiles = await Promise.all(detailedFilesPromises);
-        console.table(detailedFiles);
+        console.table(detailedFiles);  // stocker dans un tableau
 
     } catch (error) {
-        console.error("Error occurred while reading the directory!", error);
+        console.error(error);
     }
 }
 
-function createDir(filepath){
+function createDir(filepath){  // créer un dossier
     fs.mkdirSync(filepath);
     console.log('Répertoire créé'); 
 }
 
-function createFile(filepath, content){
+function createFile(filepath, content){  // créer un fichier
     fs.appendFile(filepath, content, function (error) {   
         if (error) {
             console.error(error); }   
@@ -66,7 +66,7 @@ function createFile(filepath, content){
     });
 }
 
-function read(fichier){
+function read(fichier){  // lire un fichier
     fs.readFile(fichier, 'utf8', function(error, data) {
         if (error) {
             return console.error(error); }
@@ -78,10 +78,10 @@ function read(fichier){
 const operation = (response) => {
     const responseSplit = response.split(' ');
 
-    function arrierePlan(){
+    function arrierePlan(){  // lancer un programme en arrière plan
         if (responseSplit.pop() == "!"){
-                const li = response.substring(0, response.length - 1);
-                return li.concat("&");
+                const li = response.substring(0, response.length - 1); // enlever !
+                return li.concat("&"); // ajouter & à la fin
         } else {
             return "";
         }
@@ -90,7 +90,7 @@ const operation = (response) => {
     readline.emitKeypressEvents(process.stdin);
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
     process.stdin.on("keypress", (str, key) => {
-    if(key.ctrl && key.name == "o") {   // Ctrl + o pour sortir du shell
+    if(key.ctrl && key.name == "p") {   // Ctrl + p pour sortir du shell
         process.exit(1); }
     });
 
@@ -128,8 +128,8 @@ const operation = (response) => {
         const lireFichier = prompt("Nom du fichier: ");
         return read(lireFichier);
         
-    } else if (response == "lp"){  // Lister les processus en cours
-        const output = execSync('ps -ef', { encoding: 'utf-8' }); 
+    } else if (response == "lp"){  // Lister les process
+        const output = execSync('ps aux', { encoding: 'utf-8' }); 
         console.log('Processus en cours:\n', output); 
 
     } else if (responseSplit.length > 1 && responseSplit[0] == "bing"){  
@@ -151,10 +151,10 @@ const operation = (response) => {
         }
         
         
-    } else if(responseSplit[0] == "keep"){    //Détacher un processus
+    } else if(responseSplit[0] == "keep"){    // Détacher un processus
         const pidKeep = responseSplit[1];
         //console.log(pidKeep);
-        exec('disown -h ' + pidKeep, (error, output) => {
+        exec('disown ' + pidKeep, (error, output) => {
             if(error){
                 console.log(error);
             }
@@ -175,7 +175,7 @@ const operation = (response) => {
         });
     } 
     
-    else { console.log("Erreur"); }
+    
 };
 
-loop();
+loop(); // Boucler de manière infinie
