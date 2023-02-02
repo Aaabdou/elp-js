@@ -25,6 +25,8 @@ program
   .option("bing -k", "Tuer un processus")
   .option("bing -p", "Mettre un processus en pause")
   .option("bing -c", "Reprendre un processus")
+  .option("keep", "Détacher un processus")
+  .option("run", "Exécuter un programme")
   .parse(process.argv);
 
 const Hello = () => {
