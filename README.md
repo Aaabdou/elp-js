@@ -1,4 +1,4 @@
-# elp-js
+## CLI interactive - Javascript
 ### How to use :
 1. mkdir : Créer un dossier
 2. dir : Lister un répertoire
