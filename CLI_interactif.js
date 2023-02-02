@@ -1,4 +1,3 @@
-//https://github.com/sfrenot/javascript/blob/master/ProjectDesc.md
 var fs = require('fs');
 const readline = require('readline');
 const input = readline.createInterface(process.stdin, process.stdout);
@@ -9,7 +8,6 @@ const { exec } = require('child_process');
 const figlet = require("figlet");
 const { Command } = require("commander");
 const program = new Command();
-//const { stdout, stdin, pid } = require('process');
 
 
 console.log(figlet.textSync("Bonjour"));
@@ -33,7 +31,7 @@ const Hello = () => {
     return new Promise(resolve => input.question("> ", resolve));
 }
 
-function loop(){
+function loop(){  // Boucler de manière infinie
     Hello().then(operation).finally(loop);
 }
 
@@ -80,7 +78,7 @@ const operation = (response) => {
 
     function arrierePlan(){  // lancer un programme en arrière plan
         if (responseSplit.pop() == "!"){
-                const li = response.substring(0, response.length - 1); // enlever !
+                const li = response.substring(0, response.length - 1); 
                 return li.concat("&"); // ajouter & à la fin
         } else {
             return "";
@@ -152,18 +150,32 @@ const operation = (response) => {
         
         
     } else if(responseSplit[0] == "keep"){    // Détacher un processus
-        const pidKeep = responseSplit[1];
-        //console.log(pidKeep);
-        exec('disown ' + pidKeep, (error, output) => {
+        const keep = responseSplit[1];
+        const ops = responseSplit[2]
+        // exec('disown ' + keep, (error, output) => {
+        //     if(error){
+        //         console.log(error);
+        //     }
+        //     else {
+        //         console.log(output, "Processus détaché");
+        //     }
+        // });
+        
+        exec('nohup ' + String(keep, ops), function(error, stdout, stderr){
+            if(stdout){
+                console.log('stdout: ' + stdout);
+            }
+            if(stderr){
+                console.log('stderr: ' + stderr);
+            }
             if(error){
-                console.log(error);
-            }
-            else {
-                console.log(output, "Processus détaché");
-            }
+                return reject (error); 
+            } 
         });
+        
+        
 
-    } else if(response == "run"){
+    } else if(response == "run"){  // Exécuter un programme
         const app = prompt("Prog: ")
         exec(app + arrierePlan(), (error, output) => {
             if(error){
@@ -173,9 +185,12 @@ const operation = (response) => {
                 console.log(output);
             }
         });
-    } 
+
+    } else {
+        console.log("Command not found")
+    }
     
     
 };
 
-loop(); // Boucler de manière infinie
+loop(); 
