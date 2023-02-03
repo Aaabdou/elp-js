@@ -188,10 +188,16 @@ const operation = (response) => {
             }
         });
 
-    } else {
-        console.log("Command not found")
+    } else {  // lancer toutes les commandes de linux
+        exec(response, (error, output) => {
+            if(error){
+                console.log(error);
+            }
+            else {
+                console.log(output);
+            }
+        });
     }
-    
     
 };
 
